@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -60,6 +60,18 @@ sub get_fields {
 	my %new = map +($_ => $content{$_}), @fields;
 
 	return %new;
+}
+
+# OnlinePayment's remap_fields is buggy in 2.x; this is copied from 3.x
+#
+sub remap_fields {
+	my ($self, %map) = @_;
+
+	my %content = $self->content();
+	foreach (keys %map) {
+		$content{$map{$_}} = delete $content{$_};
+	}
+	$self->content(%content);
 }
 
 # Combine get_fields and remap_fields for convenience

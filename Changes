@@ -1,5 +1,8 @@
 Revision history for Perl extension Business::OnlinePayment::InternetSecure.
 
+0.02  Tue, 02 May 2006 17:30:49 -0400
+	- Worked around remap_fields bug in B:OP 2.x
+
 0.01  Sat, 18 Feb 2006 01:34:33 -0500
 	- Original release
 
