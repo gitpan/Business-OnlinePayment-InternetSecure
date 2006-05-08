@@ -7,4 +7,5 @@ t/10base.t
 t/20emit.t
 t/30parse.t
 t/40live.t
+t/50idempotence.t
 META.yml                                 Module meta-data (added by MakeMaker)

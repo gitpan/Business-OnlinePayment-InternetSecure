@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -50,37 +50,20 @@ sub set_defaults {
 	$self->tax_amounts( {} );
 }
 
-# OnlinePayment's get_fields now filters out undefs in 3.x. :(
-#
-sub get_fields {
-	my ($self, @fields) = @_;
-
-	my %content = $self->content;
-
-	my %new = map +($_ => $content{$_}), @fields;
-
-	return %new;
-}
-
-# OnlinePayment's remap_fields is buggy in 2.x; this is copied from 3.x
-#
-sub remap_fields {
-	my ($self, %map) = @_;
-
-	my %content = $self->content();
-	foreach (keys %map) {
-		$content{$map{$_}} = delete $content{$_};
-	}
-	$self->content(%content);
-}
-
-# Combine get_fields and remap_fields for convenience
+# Combine get_fields and remap_fields for convenience.  Unlike OnlinePayment's
+# remap_fields, this doesn't modify content(), and can therefore be called
+# more than once.  Also, unlike OnlinePayment's get_fields in 3.x, this doesn't
+# exclude undefs.
 #
 sub get_remap_fields {
 	my ($self, %map) = @_;
 
-	$self->remap_fields(reverse %map);
-	my %data = $self->get_fields(keys %map);
+	my %content = $self->content();
+	my %data;
+
+	while (my ($to, $from) = each %map) {
+		$data{$to} = $content{$from};
+	}
 
 	return %data;
 }
