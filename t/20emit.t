@@ -17,7 +17,7 @@ use constant TRANSACTIONS => (
 
 		type		=> 'Visa',
 		card_number	=> '4111 1111 1111 1111',
-		exp_date	=> '2004-07',
+		expiration	=> '2004-07',
 		cvv2		=> '000',
 
 		name		=> "Fr\N{LATIN SMALL LETTER E WITH ACUTE}d\N{LATIN SMALL LETTER E WITH ACUTE}ric Bri\N{LATIN SMALL LETTER E WITH GRAVE}re",
@@ -59,7 +59,7 @@ use constant TRANSACTIONS => (
 		action		=> 'Normal Authorization',
 
 		card_number	=> '5111-1111-1111-1111',
-		exp_date	=> '7/2004',
+		expiration	=> '7/2004',
 
 		name		=> "\x{201c}Fr\x{e9}d\x{e9}ric Bri\x{e8}re\x{201d}",
 
@@ -74,7 +74,7 @@ use constant TRANSACTIONS => (
 		action		=> 'Normal Authorization',
 
 		card_number	=> '5111-1111-1111-1111',
-		exp_date	=> '0704',
+		expiration	=> '0704',
 
 		name		=> "Fr\x{e9}d\x{e9}ric Bri\x{e8}re",
 

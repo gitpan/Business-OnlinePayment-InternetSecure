@@ -22,7 +22,7 @@ $txn->content(
 
 		type		=> 'Visa',
 		card_number	=> '0000000000000000',
-		exp_date	=> '2004/07',
+		expiration	=> '2004/07',
 
 		name		=> "Fr\x{e9}d\x{e9}ric Bri\x{e8}re",
 		address		=> '123 Nowhere',

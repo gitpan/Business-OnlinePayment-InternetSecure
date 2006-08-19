@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -39,16 +39,21 @@ sub set_defaults {
 	$self->path('/process.cgi');
 
 	$self->build_subs(qw(
-				receipt_number	sales_number	uuid	guid
+				receipt_number	order_number	uuid	guid
 				date
 				card_type	cardholder
 				total_amount	tax_amounts
-				avs_response	cvv2_response
+				avs_code	cvv2_response
 			));
 	
 	# Just in case someone tries to call tax_amounts() *before* submit()
 	$self->tax_amounts( {} );
 }
+
+# Backwards-compatible support for renamed fields
+sub avs_response { shift()->avs_code(@_) }
+sub sales_number { shift()->order_number(@_) }
+
 
 # Combine get_fields and remap_fields for convenience.  Unlike OnlinePayment's
 # remap_fields, this doesn't modify content(), and can therefore be called
@@ -135,12 +140,18 @@ sub to_xml {
 
 	my %content = $self->content;
 
-	$self->required_fields(qw(action card_number exp_date));
+	# Backwards-compatible support for exp_date
+	if (exists $content{exp_date} && ! exists $content{expiration}) {
+		$content{expiration} = delete $content{exp_date};
+		$self->content(%content);
+	}
+
+	$self->required_fields(qw(action card_number expiration));
 
 	croak "Unsupported transaction type: $content{type}"
 		if $content{type} &&
 			! grep lc($content{type}) eq lc($_),
-				values %{+CARD_TYPES};
+				values %{+CARD_TYPES}, 'CC';
 	
 	croak 'Unsupported action'
 		unless $content{action} =~ /^Normal Authori[zs]ation$/i;
@@ -178,7 +189,7 @@ sub to_xml {
 	$data{xxxCard_Number} =~ tr/- //d;
 	$data{xxxCard_Number} =~ s/^[^3-6]/4/ if $self->test_transaction;
 
-	my ($y, $m) = $self->parse_expdate($content{exp_date});
+	my ($y, $m) = $self->parse_expdate($content{expiration});
 	$data{xxxCCYear} = sprintf '%.4u' => $y;
 	$data{xxxCCMonth} = sprintf '%.2u' => $m;
 
@@ -269,11 +280,11 @@ sub parse_response {
 			result_code	=> 'Page',
 			error_message	=> 'Verbiage',
 			authorization	=> 'ApprovalCode',
-			avs_response	=> 'AVSResponseCode',
+			avs_code	=> 'AVSResponseCode',
 			cvv2_response	=> 'CVV2ResponseCode',
 
 			receipt_number	=> 'ReceiptNumber',
-			sales_number	=> 'SalesOrderNumber',
+			order_number	=> 'SalesOrderNumber',
 			uuid		=> 'GUID',
 			guid		=> 'GUID',
 
@@ -347,7 +358,7 @@ Business::OnlinePayment::InternetSecure - InternetSecure backend for Business::O
 
   	type		=> 'Visa',			# Optional
 	card_number	=> '4111 1111 1111 1111',
-	exp_date	=> '2004-07',
+	expiration	=> '2004-07',
 	cvv2		=> '000',			# Optional
 
 	name		=> "Fr\x{e9}d\x{e9}ric Bri\x{e8}re",
@@ -423,6 +434,8 @@ Transaction type, being one of the following:
 
 =item - JCB
 
+=item - CC
+
 =back
 
 (This is actually ignored for the moment, and can be left blank or undefined.)
@@ -431,7 +444,7 @@ Transaction type, being one of the following:
 
 Credit card number.  Spaces and dashes are automatically removed.
 
-=item exp_date (required)
+=item expiration (required)
 
 Credit card expiration date.  Since C<Business::OnlinePayment> does not specify
 any syntax, this module is rather lax regarding what it will accept.  The
@@ -512,7 +525,7 @@ B<is_success>() instead.)
 Receipt number (a string, actually) of this transaction, unique to all
 InternetSecure transactions.
 
-=item sales_number()
+=item order_number()
 
 Sales order number of this transaction.  This is a number, unique to each
 merchant, which is incremented by 1 each time.
@@ -530,7 +543,7 @@ B<guid>() is provided as an alias to this method.
 
 Authorization code for this transaction.
 
-=item avs_response() / cvv2_response()
+=item avs_code() / cvv2_response()
 
 Results of the AVS and CVV2 checks.  See the InternetSecure documentation for
 the list of possible values.

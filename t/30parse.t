@@ -2,10 +2,10 @@
 
 use constant FIELDS => qw(
 			result_code authorization error_message
-			receipt_number sales_number
+			receipt_number order_number
 			date
 			card_type
-			avs_response cvv2_response
+			avs_code cvv2_response
 			total_amount tax_amounts
 			);
 
@@ -16,10 +16,10 @@ use constant RESULTS => (
 					authorization	=> 'T00000',
 					error_message	=> undef,
 					receipt_number	=> '1096019995.5012',
-					sales_number	=> 0,
+					order_number	=> 0,
 					date		=> '2003/12/17 09:59:58',
 					card_type	=> undef,
-					avs_response	=> undef,
+					avs_code	=> undef,
 					cvv2_response	=> undef,
 					total_amount	=> 3.88,
 					tax_amounts	=> { GST => 0.25 },
@@ -32,10 +32,10 @@ use constant RESULTS => (
 					authorization	=> undef,
 					error_message	=> 'Real error message',
 					receipt_number	=> '1096021915.5853',
-					sales_number	=> 729,
+					order_number	=> 729,
 					date		=> '2003/12/17 10:31:58',
 					card_type	=> 'Visa',
-					avs_response	=> undef,
+					avs_code	=> undef,
 					cvv2_response	=> undef,
 					total_amount	=> 3.88,
 					tax_amounts	=> { GST => 0.25,

@@ -12,7 +12,7 @@ use constant TRANSACTION =>
 		action		=> 'Normal Authorization',
 
 		card_number	=> '5111-1111-1111-1111',
-		exp_date	=> '0704',
+		expiration	=> '0704',
 
 		name		=> "Fr\x{e9}d\x{e9}ric Bri\x{e8}re",
 
