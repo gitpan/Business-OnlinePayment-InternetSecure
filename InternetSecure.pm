@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -650,7 +650,11 @@ L<Business::OnlinePayment>
 
 =head1 AUTHOR
 
-Frédéric Brière, E<lt>fbriere@fbriere.netE<gt>
+Original author: Frédéric Brière, E<lt>fbriere@fbriere.netE<gt>.  Please don't
+bother Frédéric with emails about this module.
+
+Currentuly (minimally) maintained by Ivan Kohler.  See
+http://rt.cpan.org/Public/Bug/Report.html?Queue=Business-OnlinePayment-InternetSecure to submit patches and bug reports.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -659,6 +663,5 @@ Copyright (C) 2006 by Frédéric Brière
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
 at your option, any later version of Perl 5 you may have available.
-
 
 =cut

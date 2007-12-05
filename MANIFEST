@@ -12,4 +12,3 @@ t/avs_response.t
 t/exp_date.t
 t/sales_number.t
 t/types.t
-META.yml                                 Module meta-data (added by MakeMaker)
