@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -182,6 +182,8 @@ sub to_xml {
 			xxxShippingCountry	ship_country
 			xxxShippingPhone	ship_phone
 			xxxShippingEmail	ship_email
+
+			xxxCustomerDB		cimb_store
 		));
 	
 	$data{MerchantNumber} = $self->merchant_id;
@@ -192,6 +194,8 @@ sub to_xml {
 	my ($y, $m) = $self->parse_expdate($content{expiration});
 	$data{xxxCCYear} = sprintf '%.4u' => $y;
 	$data{xxxCCMonth} = sprintf '%.2u' => $m;
+	
+	delete $data{xxxCustomerDB} unless $data{xxxCustomerDB};
 
 	if (defined $content{cvv2} && $content{cvv2} ne '') {
 		$data{CVV2} = 1;
@@ -350,7 +354,7 @@ Business::OnlinePayment::InternetSecure - InternetSecure backend for Business::O
 
   use Business::OnlinePayment;
 
-  $txn = new Business::OnlinePayment 'InternetSecure',
+  my $txn = new Business::OnlinePayment 'InternetSecure',
   					merchant_id => '0000';
 
   $txn->content(
@@ -375,14 +379,18 @@ Business::OnlinePayment::InternetSecure - InternetSecure backend for Business::O
 	currency	=> 'CAD',
 	taxes		=> 'GST PST',
 	description	=> 'Test transaction',
+
+	cimb_store      => 1, # Tokenization Support
+
+	test_transaction => 1, # or -1 to dest declined
 	);
 
   $txn->submit;
 
   if ($txn->is_success) {
-  	print "Card processed successfully: " . $tx->authorization . "\n";
+  	print "Card processed successfully: " . $txn->authorization . "\n";
   } else {
-  	print "Card was rejected: " . $tx->error_message . "\n";
+  	print "Card was rejected: " . $txn->error_message . "\n";
   }
 
 =head1 DESCRIPTION
@@ -650,11 +658,7 @@ L<Business::OnlinePayment>
 
 =head1 AUTHOR
 
-Original author: Frédéric Brière, E<lt>fbriere@fbriere.netE<gt>.  Please don't
-bother Frédéric with emails about this module.
-
-Currentuly (minimally) maintained by Ivan Kohler.  See
-http://rt.cpan.org/Public/Bug/Report.html?Queue=Business-OnlinePayment-InternetSecure to submit patches and bug reports.
+Frédéric Brière, E<lt>fbriere@fbriere.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -663,5 +667,6 @@ Copyright (C) 2006 by Frédéric Brière
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
 at your option, any later version of Perl 5 you may have available.
+
 
 =cut
