@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -45,7 +45,7 @@ sub set_defaults {
 				total_amount	tax_amounts
 				avs_code	cvv2_response
 			));
-	
+
 	# Just in case someone tries to call tax_amounts() *before* submit()
 	$self->tax_amounts( {} );
 }
@@ -152,14 +152,14 @@ sub to_xml {
 		if $content{type} &&
 			! grep lc($content{type}) eq lc($_),
 				values %{+CARD_TYPES}, 'CC';
-	
+
 	croak 'Unsupported action'
 		unless $content{action} =~ /^Normal Authori[zs]ation$/i;
-	
+
 	$content{currency} = uc($content{currency} || 'CAD');
 	croak "Unknown currency code ", $content{currency}
 		unless $content{currency} =~ /^(CAD|USD)$/;
-	
+
 	my %data = $self->get_remap_fields(qw(
 			xxxCard_Number		card_number
 
@@ -185,7 +185,7 @@ sub to_xml {
 
 			xxxCustomerDB		cimb_store
 		));
-	
+
 	$data{MerchantNumber} = $self->merchant_id;
 
 	$data{xxxCard_Number} =~ tr/- //d;
@@ -194,7 +194,7 @@ sub to_xml {
 	my ($y, $m) = $self->parse_expdate($content{expiration});
 	$data{xxxCCYear} = sprintf '%.4u' => $y;
 	$data{xxxCCMonth} = sprintf '%.2u' => $m;
-	
+
 	delete $data{xxxCustomerDB} unless $data{xxxCustomerDB};
 
 	if (defined $content{cvv2} && $content{cvv2} ne '') {
@@ -204,7 +204,7 @@ sub to_xml {
 		$data{CVV2} = 0;
 		$data{CVV2Indicator} = '';
 	}
-	
+
 	if (ref $content{description}) {
 		$data{Products} = join '|' => map $self->prod_string(
 						$content{currency},
@@ -272,14 +272,14 @@ sub parse_response {
 	$self->server_response($response);
 
 	local $/ = "\n";  # Make sure to avoid bug #17687
-	
+
 	$response = xml_in($response,
  			ForceArray => [qw(product flag)],
  			GroupTags => { qw(Products product flags flag) },
  			KeyAttr => [],
  			SuppressEmpty => undef,
 		);
-	
+
 	$self->infuse($response,
 			result_code	=> 'Page',
 			error_message	=> 'Verbiage',
@@ -297,7 +297,7 @@ sub parse_response {
 			card_type	=> 'CardType',
 			total_amount	=> 'TotalAmount',
 			);
-	
+
 	$self->is_success(scalar grep $self->result_code eq $_, SUCCESS_CODES);
 
 	# Completely undocumented field that sometimes override <Verbiage>
@@ -305,9 +305,9 @@ sub parse_response {
 
 	# Delete error_message if transaction was successful
 	$self->error_message(undef) if $self->is_success;
-	
+
 	$self->card_type(CARD_TYPES->{$self->card_type});
-	
+
 	$self->tax_amounts( { $self->extract_tax_amounts($response) } );
 
 	return $self;
@@ -319,7 +319,7 @@ sub submit {
 	croak "Missing required argument 'merchant_id'"
 		unless defined $self->{merchant_id};
 
-	my ($page, $response, %headers) = 
+	my ($page, $response, %headers) =
 		post_https(
 				$self->server,
 				$self->port,
@@ -658,11 +658,12 @@ L<Business::OnlinePayment>
 
 =head1 AUTHOR
 
-Frédéric Brière, E<lt>fbriere@fbriere.netE<gt>
+FrÃ©dÃ©ric BriÃ¨re, E<lt>fbriere@fbriere.netE<gt>
+Slobodan MiÅ¡koviÄ‡, E<lt>slobodan.miskovic@taskforce-1.comE<gt>, http://www.taskforce-1.com/
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 by Frédéric Brière
+Copyright (C) 2006 by FrÃ©dÃ©ric BriÃ¨re
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

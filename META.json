@@ -1,10 +1,11 @@
 {
    "abstract" : "InternetSecure backend for Business::OnlinePayment",
    "author" : [
-      "Frédéric Brière <fbriere@fbriere.net>"
+      "FrÃ©dÃ©ric BriÃ¨re <fbriere@fbriere.net>",
+      "Slobodan MiÅ¡koviÄ‡ <slobodan.miskovic@taskforce-1.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "unknown"
    ],
@@ -39,5 +40,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06"
+   "version" : "0.07"
 }
