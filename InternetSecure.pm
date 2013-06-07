@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -124,6 +124,20 @@ sub prod_string {
 		push @flags, $self->test_transaction < 0 ? 'TESTD' : 'TEST';
 	}
 
+	# recurring can come as string or hashref
+	if ($data{recurring}) {
+		if (ref $data{recurring}) {
+			my @options;
+			push @options, 'RB';
+			foreach my $key ( sort keys %{ $data{recurring} } ) {
+				push @options, $key . '=' . $data{recurring}{$key};
+			}
+			push @flags, join ' ', @options;
+		} else {
+			push @flags, "RB $data{recurring}";
+		}
+	}
+
 	return join '::' =>
 				sprintf('%.2f' => $data{amount}),
 				$data{quantity} || 1,
@@ -197,6 +211,12 @@ sub to_xml {
 
 	delete $data{xxxCustomerDB} unless $data{xxxCustomerDB};
 
+	# Recurring
+	#warn $self->recurring;
+	if (defined $content{recurring} && $content{recurring} ne '') {
+		$data{xxxCardInput} = 8;
+	}
+
 	if (defined $content{cvv2} && $content{cvv2} ne '') {
 		$data{CVV2} = 1;
 		$data{CVV2Indicator} = $content{cvv2};
@@ -218,6 +238,7 @@ sub to_xml {
 					taxes       => $content{taxes},
 					amount      => $content{amount},
 					description => $content{description},
+					recurring   => $content{recurring},
 				);
 	}
 
@@ -344,7 +365,7 @@ sub submit {
 1;
 
 __END__
-
+=encoding utf-8
 
 =head1 NAME
 
@@ -379,6 +400,8 @@ Business::OnlinePayment::InternetSecure - InternetSecure backend for Business::O
 	currency	=> 'CAD',
 	taxes		=> 'GST PST',
 	description	=> 'Test transaction',
+
+	recurring       => 'amount=9.95 startmonth=+1 frequency=monthly duration=3 email=2',
 
 	cimb_store      => 1, # Tokenization Support
 
@@ -656,9 +679,10 @@ None by default.
 
 L<Business::OnlinePayment>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Frédéric Brière, E<lt>fbriere@fbriere.netE<gt>
+
 Slobodan Mišković, E<lt>slobodan.miskovic@taskforce-1.comE<gt>, http://www.taskforce-1.com/
 
 =head1 COPYRIGHT AND LICENSE
