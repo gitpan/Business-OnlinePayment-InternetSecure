@@ -98,7 +98,7 @@ foreach (TRANSACTIONS) {
 	is_deeply(
 		xml_in($txn->to_xml),
 		xml_in($data)
-	); 
+	);
 }
 
 
@@ -109,8 +109,8 @@ __DATA__
   <xxxCard_Number>4111111111111111</xxxCard_Number>
   <xxxCCMonth>07</xxxCCMonth>
   <xxxCCYear>2004</xxxCCYear>
-  <CVV2>1</CVV2>
-  <CVV2Indicator>000</CVV2Indicator>
+  <CVV2>000</CVV2>
+  <CVV2Indicator>1</CVV2Indicator>
   <Products>9.99::5::a 001::Some product::{USD}{HST}|5.65::1::::Shipping::{USD}{GST}{PST}|10.00::1::::Some HST example::{USD}{GST}{PST}</Products>
   <xxxName>Frédéric Brière</xxxName>
   <xxxCompany></xxxCompany>
@@ -138,8 +138,8 @@ __DATA__
   <xxxCard_Number>5111111111111111</xxxCard_Number>
   <xxxCCMonth>07</xxxCCMonth>
   <xxxCCYear>2004</xxxCCYear>
-  <CVV2>0</CVV2>
-  <CVV2Indicator></CVV2Indicator>
+  <CVV2></CVV2>
+  <CVV2Indicator>0</CVV2Indicator>
   <Products>12.95::1::::Box o' goodies::{USD}{GST}{TEST}</Products>
   <xxxName>?Frédéric Brière?</xxxName>
   <xxxCompany></xxxCompany>
@@ -167,8 +167,8 @@ __DATA__
   <xxxCard_Number>5111111111111111</xxxCard_Number>
   <xxxCCMonth>07</xxxCCMonth>
   <xxxCCYear>2004</xxxCCYear>
-  <CVV2>0</CVV2>
-  <CVV2Indicator></CVV2Indicator>
+  <CVV2></CVV2>
+  <CVV2Indicator>0</CVV2Indicator>
   <Products>13.95::1::::::{CAD}{TESTD}</Products>
   <xxxName>Frédéric Brière</xxxName>
   <xxxCompany></xxxCompany>

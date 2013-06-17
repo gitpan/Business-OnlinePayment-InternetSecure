@@ -1,6 +1,9 @@
 Revision history for Perl extension Business::OnlinePayment::InternetSecure.
 
 0.08
+	- Fix CVV2 Support
+
+0.08
 	- Recurring billing support
 
 0.07

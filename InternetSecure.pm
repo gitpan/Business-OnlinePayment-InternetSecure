@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -218,11 +218,11 @@ sub to_xml {
 	}
 
 	if (defined $content{cvv2} && $content{cvv2} ne '') {
-		$data{CVV2} = 1;
-		$data{CVV2Indicator} = $content{cvv2};
+		$data{CVV2} = $content{cvv2};
+		$data{CVV2Indicator} = 1;
 	} else {
-		$data{CVV2} = 0;
-		$data{CVV2Indicator} = '';
+		$data{CVV2} = '';
+		$data{CVV2Indicator} = 0;
 	}
 
 	if (ref $content{description}) {

@@ -25,8 +25,8 @@ is_deeply( xml_in($txn->to_xml), xml_in(<<__EOF__) );
   <xxxCard_Number>5111111111111111</xxxCard_Number>
   <xxxCCMonth>03</xxxCCMonth>
   <xxxCCYear>2013</xxxCCYear>
-  <CVV2>0</CVV2>
-  <CVV2Indicator></CVV2Indicator>
+  <CVV2></CVV2>
+  <CVV2Indicator>0</CVV2Indicator>
   <Products>13.95::1::::::{CAD}</Products>
   <xxxName></xxxName>
   <xxxCompany></xxxCompany>
