@@ -12,7 +12,7 @@ use XML::Simple qw(xml_in xml_out);
 use base qw(Business::OnlinePayment Exporter);
 
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 
 use constant SUCCESS_CODES => qw(2000 90000 900P1);
@@ -162,13 +162,13 @@ sub to_xml {
 
 	$self->required_fields(qw(action card_number expiration));
 
-	croak "Unsupported transaction type: $content{type}"
+	croak "Unsupported card type: $content{type}"
 		if $content{type} &&
 			! grep lc($content{type}) eq lc($_),
 				values %{+CARD_TYPES}, 'CC';
 
 	croak 'Unsupported action'
-		unless $content{action} =~ /^Normal Authori[zs]ation$/i;
+		unless $content{action} =~ /^(Normal|Card) Authori[zs]ation$/i;
 
 	$content{currency} = uc($content{currency} || 'CAD');
 	croak "Unknown currency code ", $content{currency}
@@ -212,7 +212,6 @@ sub to_xml {
 	delete $data{xxxCustomerDB} unless $data{xxxCustomerDB};
 
 	# Recurring
-	#warn $self->recurring;
 	if (defined $content{recurring} && $content{recurring} ne '') {
 		$data{xxxCardInput} = 8;
 	}
@@ -225,21 +224,34 @@ sub to_xml {
 		$data{CVV2Indicator} = 0;
 	}
 
-	if (ref $content{description}) {
-		$data{Products} = join '|' => map $self->prod_string(
-						$content{currency},
-						taxes => $content{taxes},
-						%$_),
-					@{ $content{description} };
-	} else {
-		$self->required_fields(qw(amount));
+	if ($content{action} =~ /^Card Authori[zs]ation$/i) {
+		$data{xxxTransType} = 22;
+
 		$data{Products} = $self->prod_string(
 					$content{currency},
-					taxes       => $content{taxes},
-					amount      => $content{amount},
-					description => $content{description},
-					recurring   => $content{recurring},
+					taxes       => 0,
+					amount      => 0.0,
+					description => 'CardAuth and Store',
 				);
+	} else {
+
+		if (ref $content{description}) {
+			$data{Products} = join '|' => map $self->prod_string(
+							$content{currency},
+							taxes => $content{taxes},
+							%$_),
+						@{ $content{description} };
+		} else {
+			$self->required_fields(qw(amount));
+			$data{Products} = $self->prod_string(
+						$content{currency},
+						taxes       => $content{taxes},
+						amount      => $content{amount},
+						description => $content{description},
+						recurring   => $content{recurring},
+					);
+		}
+
 	}
 
 	# The encode() makes sure to a) strip off non-Latin-1 characters, and
@@ -379,7 +391,7 @@ Business::OnlinePayment::InternetSecure - InternetSecure backend for Business::O
   					merchant_id => '0000';
 
   $txn->content(
-	action		=> 'Normal Authorization',
+	action		=> 'Normal Authorization', # or 'Card Authentication'
 
   	type		=> 'Visa',			# Optional
 	card_number	=> '4111 1111 1111 1111',
@@ -446,12 +458,12 @@ Sets up the data prior to a transaction.  CONTENT is an associative array
 
 =item action (required)
 
-What to do with the transaction.  Only C<Normal Authorization> is supported
+What to do with the transaction. C<Normal Authorization> and C<Card Authorization> are supported
 at the moment.
 
 =item type
 
-Transaction type, being one of the following:
+Card type, being one of the following:
 
 =over 4
 

@@ -43,3 +43,16 @@ is($txn->result_code, '2000', 'Result code is ok');
 is($txn->cardholder, "Fr\x{e9}d\x{e9}ric Bri\x{e8}re",
 	'Cardholder name is encoded properly');
 
+$txn->content(
+		action		=> 'Card Authorization',
+
+		type		=> 'Visa',
+		card_number	=> '0000000000000000',
+		expiration	=> '2014/07',
+
+		name		=> "Slobodan Miskovic",
+	);
+
+$txn->submit;
+
+is($txn->result_code, '2000', 'CIMB store succesfull');
